@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+        {
+            "apiVersion": "2023-01-01",
+            "type": "Microsoft.ContainerService/managedClusters",
+            "name": "[parameters('Cluster Name')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                            "type": "SystemAssigned"
+                        },
+            "properties": {
+                "kubernetesVersion": "1.27.7", 
+                "dnsPrefix": "adakscluster",
+                "servicePrincipalProfile": {
+                          "clientId": "msi"
+                                           },
+                "agentPoolProfiles": [
+                    {
+                        "name": "systempool",
+                        "count": 1,
+                        "vmSize": "Standard_DS2_v2",
+                        "osType": "Linux",
+                        "mode": "System"
+                    },
+                    {
+                        "name": "node1",
+                        "count": 1,
+                        "vmSize": "Standard_B2s",
+                        "osType": "Linux"
+                    },
+                    {
+                        "name": "node2",
+                        "count": 1,
+                        "vmSize": "Standard_B2s", 
+                        "osType": "Linux"
+                    }
+                ]
+            }
+        }
+    ],
+    "parameters": {
+        "Cluster Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Cluster Name"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location"
+            }
+        }
+    },
+    "outputs": {
+        "aksClusterFQDN": {
+            "type": "string",
+            "value": "[reference(parameters('Cluster Name')).fqdn]"
+        }
+    }
+}
